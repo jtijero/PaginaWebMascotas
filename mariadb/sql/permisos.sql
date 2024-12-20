@@ -1,1 +1,5 @@
-abc
+CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY 'contrasena';
+
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%';
+FLUSH PRIVILEGES;
+

@@ -4,8 +4,19 @@ FROM debian:latest
 # Instalar Apache, Perl y módulos necesarios
 RUN apt-get update && \
     apt-get install -y apache2 libapache2-mod-perl2 perl cpanminus locales && \
-    apt-get install -y libwww-perl && \
-    apt-get install -y nano && \
+    apache2 \
+    libapache2-mod-perl2 \
+    perl \
+    locales \
+    mariadb-server \
+    libdbi-perl \
+    libdbd-mysql-perl \
+    libwww-perl \
+    build-essential \
+    libmodule-build-perl \
+    cpanminus && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*\
     apt-get install -y build-essential default-libmysqlclient-dev libmariadb-dev libssl-dev pkg-config libgd-dev && \
     apt-get install -y libemail-sender-perl libemail-simple-perl libemail-mime-perl && \
     cpanm CGI && \
@@ -37,9 +48,10 @@ RUN a2enmod ssl
 RUN mkdir -p /usr/lib/cgi-bin/ /usr/src/app/images/
 
 # Copiar archivos al contenedor
-COPY ./cgi-bin/ /usr/lib/cgi-bin/
+COPY cgi-bin/*.cgi /usr/lib/cgi-bin/
+COPY public/index.html /var/www/html/index.html
+
 COPY ./images/ /usr/src/app/images/
-COPY ./apache2.conf /etc/apache2/apache2.conf
 COPY ./000-default.conf /etc/apache2/sites-available/000-default.conf
 
 # Configurar permisos para los scripts y directorios CGI
@@ -47,8 +59,6 @@ RUN chmod +x /usr/lib/cgi-bin/*.cgi
 RUN chmod 644 /usr/src/app/images/*
 RUN chown www-data:www-data /usr/src/app/images/*
 
-# Configurar Apache para manejar UTF-8
-RUN echo 'AddDefaultCharset UTF-8' >> /etc/apache2/apache2.conf
 
 RUN a2dismod mpm_prefork mpm_worker && a2enmod mpm_event
 

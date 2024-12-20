@@ -1,1 +1,43 @@
-al
+
+services:
+  db:
+    build: ./mariadb
+    container_name: db
+    environment:
+      MYSQL_ROOT_PASSWORD: contrasena
+    volumes:
+      - db-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb --user=root --password=$$MYSQL_ROOT_PASSWORD -e 'SELECT 1'"]
+      interval: 30s
+      timeout: 10s
+      start_period: 1m
+      retries: 3
+    restart: unless-stopped
+
+
+  servidor:
+    build: ./servidor
+    container_name: servidor
+    ports:
+      - "8181:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./servidor/images:/usr/src/app/images  # Montar el volumen para las imágenes
+    networks:
+      - app-network
+    restart: unless-stopped
+
+volumes:
+  db-data:
+
+networks:
+  app-network:
+    driver: bridge
+
