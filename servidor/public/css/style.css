@@ -2,7 +2,8 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-
+  margin: 0; /* Elimina el margen por defecto */
+  overflow-x: hidden;
 }
 
 /* Estilo para el encabezado */
@@ -531,31 +532,4 @@ ul li a:hover {
 .social-media li a {
   color: black; 
   font-size: 20px; 
-}
-body {
-  margin: 0; /* Elimina el margen por defecto */
-  overflow-x: hidden; /* Elimina la barra de desplazamiento horizontal */
-}
-
-.menudearriba {
-  display: none; /* Oculta el menú por defecto */
-  flex-direction: column; /* Asegura que los elementos se apilen en columna */
-  position: absolute; /* Permite que el menú se superponga */
-  background-color: white; /* Fondo blanco para el menú */
-  width: 100%; /* Ancho completo */
-  z-index: 1000; /* Asegura que esté por encima de otros elementos */
-}
-
-.menudearriba ul {
-  list-style-type: none; /* Elimina los puntos de la lista */
-  padding: 0; /* Elimina el padding */
-  margin: 0; /* Elimina el margen */
-}
-
-.menudearriba li {
-  padding: 10px; /* Espaciado entre los elementos del menú */
-}
-
-.menu-icon {
-  cursor: pointer; /* Cambia el cursor al pasar sobre el icono del menú */
 }

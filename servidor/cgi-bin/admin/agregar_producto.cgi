@@ -29,7 +29,7 @@ if ($upload_filehandle) {
     close $upload_fh;
 }
 
-my $dbh = DBI->connect("DBI:MariaDB:database=principal;host=db", "root", "contrasena", {'RaiseError' => 1});
+my $dbh = DBI->connect("DBI:MariaDB:database=principal;host=localhost", "root", "contrasena", {'RaiseError' => 1});
 
 my $sth = $dbh->prepare("INSERT INTO productos (nombre, descripcion, precio, stock, tipo, imagen_ruta) VALUES (?, ?, ?, ?, ?, ?)");
 $sth->execute($nombre, $descripcion, $precio, $stock, $tipo, $filename);

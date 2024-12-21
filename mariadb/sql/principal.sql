@@ -82,13 +82,6 @@ INSERT INTO perfiles (mascota_id, raza, caracteristicas, alergias, edad) VALUES
 (1, 'Labrador', 'Amigable y enérgico', 'Polen', 3),
 (2, 'Siames', 'Juguetón y vocal', 'Polvo', 2);
 
-INSERT INTO fotos (mascota_id, ruta_foto, descripcion) VALUES
-(1, '/fotos/fido/foto1.jpg', 'Foto de Fido'),
-(2, '/fotos/cat/foto1.jpg', 'Foto de Cat');
-
-INSERT INTO likes_foros (publicacion_id, duenio_id) VALUES
-(1, 4),
-(2, 5);
 
 INSERT INTO productos (nombre, descripcion, tipo, precio, stock, imagen_ruta) VALUES
 ('Collar para Perros', 'Collar ajustable para perros de tamaño mediano', 'Perro', 19.99, 50, '/images/collar_perro.jpg'),

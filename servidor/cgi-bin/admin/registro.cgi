@@ -28,7 +28,7 @@ if ($email !~ /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/) {
 my $salt = en_base64(random_bytes(16));
 my $password_hash = bcrypt($password, '$2a$10$' . $salt);
 
-my $dbh = DBI->connect("DBI:MariaDB:database=permisos;host=db", "root", "contrasena", {'RaiseError' => 1});
+my $dbh = DBI->connect("DBI:MariaDB:database=permisos;host=localhost", "root", "contrasena", {'RaiseError' => 1});
 
 my $sth = $dbh->prepare("SELECT COUNT(*) FROM usuarios WHERE nombre = ? OR correo = ?");
 $sth->execute($username, $email);
@@ -77,7 +77,7 @@ print <<HTML;
     <div class="container">
         <div class="configuracion">
             <h2>Configuración de Cuenta</h2>
-            <form action="http://localhost:8000/cgi-bin/update_persona.cgi" method="post">
+            <form action="http://localhost:8181/servidor/cgi-bin/update_persona.cgi" method="post">
                 <input type="hidden" name="user_id" value="<!-- ID del usuario aquí -->">
                 <label for="direccion">Dirección:</label><br>
                 <input type="text" id="direccion" name="direccion" required><br><br>
@@ -87,17 +87,6 @@ print <<HTML;
                 <input type="number" id="edad" name="edad" required><br><br>
                 <button type="submit">Guardar Cambios</button>
             </form>
-        </div>
-        <div class="opciones">
-            <h2>Opciones para Mascotas</h2>
-            <p>Ya tienes una mascota, regístrala para ser parte de nuestra comunidad y recibir promociones:</p>
-            <a href="http://localhost:8080/registro_mascota.html">
-                <button>Registrar Mascota</button>
-            </a>
-            <p>No tienes una mascota, adopta alguna de nuestra comunidad:</p>
-            <a href="http://localhost:8080/adopcion.html">
-                <button>Adoptar Mascota</button>
-            </a>
         </div>
     </div>
 </body>

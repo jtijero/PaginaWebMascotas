@@ -1,9 +1,12 @@
-# Usar una imagen base de Debian
+# Usa una imagen base de Debian
 FROM debian:latest
 
-# Instalar Apache, Perl y módulos necesarios
+# Establecer variables de entorno para evitar interacciones durante la instalación
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Instala dependencias y módulos necesarios en una sola capa
 RUN apt-get update && \
-    apt-get install -y apache2 libapache2-mod-perl2 perl cpanminus locales && \
+    apt-get install -y --no-install-recommends \
     apache2 \
     libapache2-mod-perl2 \
     perl \
@@ -14,20 +17,20 @@ RUN apt-get update && \
     libwww-perl \
     build-essential \
     libmodule-build-perl \
-    cpanminus && \
+    cpanminus \
+    default-libmysqlclient-dev \
+    libmariadb-dev \
+    libssl-dev \
+    pkg-config \
+    libgd-dev \
+    libemail-sender-perl \
+    libemail-simple-perl \
+    libemail-mime-perl && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*\
-    apt-get install -y build-essential default-libmysqlclient-dev libmariadb-dev libssl-dev pkg-config libgd-dev && \
-    apt-get install -y libemail-sender-perl libemail-simple-perl libemail-mime-perl && \
-    cpanm CGI && \
-    cpanm DBI && \
-    cpanm DBD::MariaDB && \
-    cpanm GD::Graph && \
-    cpanm Email::Sender && \
-    cpanm GD && \
-    cpanm GD::Graph && \
-    cpan Digest::SHA && \
-    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+
+# Instala el módulo CGI usando cpanm
+RUN cpanm CGI
 
 # Generar locales y establecer la configuración de UTF-8
 RUN echo "es_ES.UTF-8 UTF-8" >> /etc/locale.gen && \
@@ -35,39 +38,46 @@ RUN echo "es_ES.UTF-8 UTF-8" >> /etc/locale.gen && \
     update-locale LANG=es_ES.UTF-8
 
 # Configurar variables de entorno para UTF-8
-ENV LANG=es_ES.UTF-8
-ENV LANGUAGE=es_ES:es
-ENV LC_ALL=es_ES.UTF-8
+ENV LANG=es_ES.UTF-8 \
+    LANGUAGE=es_ES:es \
+    LC_ALL=es_ES.UTF-8
 
-# Habilitar los módulos necesarios de Apache
-RUN a2enmod cgi
-RUN a2enmod rewrite
-RUN a2enmod ssl
+# Habilita los módulos CGI, headers, rewrite y ssl de Apache
+RUN a2enmod cgi headers rewrite ssl
 
-# Crear directorios necesarios
-RUN mkdir -p /usr/lib/cgi-bin/ /usr/src/app/images/
+# Crea los directorios necesarios
+RUN mkdir -p /usr/lib/cgi-bin /usr/src/app/images/
 
-# Copiar archivos al contenedor
+# Copia los scripts Perl y archivos HTML
 COPY cgi-bin/*.cgi /usr/lib/cgi-bin/
 COPY public/index.html /var/www/html/index.html
-
 COPY ./images/ /usr/src/app/images/
-COPY ./000-default.conf /etc/apache2/sites-available/000-default.conf
+COPY 000-default.conf /etc/apache2/sites-available/000-default.conf
+COPY prueba.sql /docker-entrypoint-initdb.d/prueba.sql
+RUN chmod +x /docker-entrypoint-initdb.d/prueba.sql
 
-# Configurar permisos para los scripts y directorios CGI
+# Copia el archivo de configuración de MariaDB
+COPY my.cnf /etc/mysql/my.cnf
+
+# Copiar el script de inicio de servicios
+COPY start_services.sh /usr/local/bin/start_services.sh
+RUN chmod +x /usr/local/bin/start_services.sh
+
+# Copia el script de inicialización de la base de datos
+COPY init_db.sh /usr/local/bin/init_db.sh
+RUN chmod +x /usr/local/bin/init_db.sh
+
+# Cambia permisos de los scripts Perl
 RUN chmod +x /usr/lib/cgi-bin/*.cgi
-RUN chmod 644 /usr/src/app/images/*
-RUN chown www-data:www-data /usr/src/app/images/*
 
+# Configura el charset de Apache
+RUN echo 'AddDefaultCharset UTF-8' >> /etc/apache2/apache2.conf
 
-RUN a2dismod mpm_prefork mpm_worker && a2enmod mpm_event
+# Exponer puertos
+EXPOSE 80 
 
-# Exponer el puerto 80
-EXPOSE 80
+# Instalar librerías adicionales
+RUN cpanm Crypt::Eksblowfish Bytes::Random::Secure
 
-# Instalar librerías adicionales después de los pasos anteriores
-RUN cpanm Crypt::Eksblowfish && \
-    cpanm Bytes::Random::Secure
-
-# Iniciar Apache en primer plano
-CMD ["apache2ctl", "-D", "FOREGROUND"]
+# Comando para iniciar Apache en primer plano
+CMD ["/usr/local/bin/start_services.sh"]

@@ -17,3 +17,32 @@ pagina
 desde la construccion de docker-compose.yml hasta el guardado de productos
 2 Dockerfile se construyen servidor y mariadb siguiendo la estructura propuesta
 en servidor estan las carpetas que contienen html cgi imagenes y javascript
+
+servidor
+├── cgi-bin
+│   ├── admin
+│       ├── agregar_producto.cgi
+│       ├── borrar_producto.cgi
+│       ├── update_producto.cgi
+│       ├── registroexitoso.cgi
+│       ├── ver_grafico.cgi
+│       └── ver_inventario.cgi
+│   └── client
+│       ├── acceder.cgi
+│       └── todoslosproductos.cgi
+├── configuraciones
+│   ├── 000-default.conf
+│   ├── comandos.txt
+│   ├── git.txt
+│   └── my.cnf
+├── db
+│   ├── login.sql
+│   └── productos.sql
+├── images
+├── public
+│   ├── index.html
+│   ├── style.css
+│   └── script.js
+├── Dockerfile
+├── init_db.sh
+└── start_services.sh
