@@ -11,7 +11,7 @@ until mysqladmin ping --silent; do
 done
 
 # Crear la base de datos y ejecutar el script SQL
-mysql < /docker-entrypoint-initdb.d/prueba.sql || { echo "Error al ejecutar el script SQL"; exit 1; }
+mysql < /docker-entrypoint-initdb.d/login.sql || { echo "Error al ejecutar el script SQL"; exit 1; }
 
 # No detener MariaDB, ya que debe seguir corriendo
 

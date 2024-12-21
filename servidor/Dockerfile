@@ -1,9 +1,6 @@
 # Usa una imagen base de Debian
 FROM debian:latest
 
-# Establecer variables de entorno para evitar interacciones durante la instalación
-ENV DEBIAN_FRONTEND=noninteractive
-
 # Instala dependencias y módulos necesarios en una sola capa
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -46,18 +43,22 @@ ENV LANG=es_ES.UTF-8 \
 RUN a2enmod cgi headers rewrite ssl
 
 # Crea los directorios necesarios
-RUN mkdir -p /usr/lib/cgi-bin /usr/src/app/images/
+RUN mkdir -p /usr/lib/cgi-bin/admin /usr/lib/cgi-bin/client /usr/src/app/images/
 
 # Copia los scripts Perl y archivos HTML
-COPY cgi-bin/*.cgi /usr/lib/cgi-bin/
+COPY cgi-bin/admin/*.cgi /usr/lib/cgi-bin/admin/
+COPY cgi-bin/client/*.cgi /usr/lib/cgi-bin/client/
 COPY public/index.html /var/www/html/index.html
-COPY ./images/ /usr/src/app/images/
-COPY 000-default.conf /etc/apache2/sites-available/000-default.conf
-COPY prueba.sql /docker-entrypoint-initdb.d/prueba.sql
-RUN chmod +x /docker-entrypoint-initdb.d/prueba.sql
+COPY public/style.css /var/www/html/style.css
+COPY public/script.js /var/www/html/script.js
+COPY images/ /usr/src/app/images/
+COPY configuraciones/000-default.conf /etc/apache2/sites-available/000-default.conf
+COPY db/login.sql /docker-entrypoint-initdb.d/login.sql
+COPY db/productos.sql /docker-entrypoint-initdb.d/productos.sql
+RUN chmod +x /docker-entrypoint-initdb.d/*.sql
 
 # Copia el archivo de configuración de MariaDB
-COPY my.cnf /etc/mysql/my.cnf
+COPY configuraciones/my.cnf /etc/mysql/my.cnf
 
 # Copiar el script de inicio de servicios
 COPY start_services.sh /usr/local/bin/start_services.sh
@@ -68,7 +69,7 @@ COPY init_db.sh /usr/local/bin/init_db.sh
 RUN chmod +x /usr/local/bin/init_db.sh
 
 # Cambia permisos de los scripts Perl
-RUN chmod +x /usr/lib/cgi-bin/*.cgi
+RUN chmod +x /usr/lib/cgi-bin/admin/*.cgi /usr/lib/cgi-bin/client/*.cgi
 
 # Configura el charset de Apache
 RUN echo 'AddDefaultCharset UTF-8' >> /etc/apache2/apache2.conf
@@ -79,5 +80,5 @@ EXPOSE 80
 # Instalar librerías adicionales
 RUN cpanm Crypt::Eksblowfish Bytes::Random::Secure
 
-# Comando para iniciar Apache en primer plano
+# Comando para iniciar los servicios
 CMD ["/usr/local/bin/start_services.sh"]

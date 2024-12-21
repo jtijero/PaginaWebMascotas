@@ -18,15 +18,16 @@ desde la construccion de docker-compose.yml hasta el guardado de productos
 2 Dockerfile se construyen servidor y mariadb siguiendo la estructura propuesta
 en servidor estan las carpetas que contienen html cgi imagenes y javascript
 
+#Arquitectura de Carpetas
 servidor
 ├── cgi-bin
 │   ├── admin
-│       ├── agregar_producto.cgi
-│       ├── borrar_producto.cgi
-│       ├── update_producto.cgi
-│       ├── registroexitoso.cgi
-│       ├── ver_grafico.cgi
-│       └── ver_inventario.cgi
+│   │   ├── agregar_producto.cgi
+│   │   ├── borrar_producto.cgi
+│   │   ├── update_producto.cgi
+│   │   ├── registroexitoso.cgi
+│   │   ├── ver_grafico.cgi
+│   │   └── ver_inventario.cgi
 │   └── client
 │       ├── acceder.cgi
 │       └── todoslosproductos.cgi
@@ -46,3 +47,45 @@ servidor
 ├── Dockerfile
 ├── init_db.sh
 └── start_services.sh
+
+Dentro del contenedor:
+
+/
+├── usr
+│   ├── lib
+│   │   └── cgi-bin
+│   │       ├── admin
+│   │       │   ├── agregar_producto.cgi
+│   │       │   ├── borrar_producto.cgi
+│   │       │   ├── update_producto.cgi
+│   │       │   ├── registroexitoso.cgi
+│   │       │   ├── ver_grafico.cgi
+│   │       │   └── ver_inventario.cgi
+│   │       └── client
+│   │           ├── acceder.cgi
+│   │           └── todoslosproductos.cgi
+│   └── local
+│       └── bin
+│           ├── start_services.sh
+│           └── init_db.sh
+├── etc
+│   ├── apache2
+│   │   └── sites-available
+│   │       └── 000-default.conf
+│   └── mysql
+│       └── my.cnf
+├── var
+│   └── www
+│       └── html
+│           ├── index.html
+│           ├── style.css
+│           └── script.js
+├── docker-entrypoint-initdb.d
+│   ├── login.sql
+│   └── productos.sql
+├── usr
+│   └── src
+│       └── app
+│           └── images
+└── etc
+    └── locale.gen
